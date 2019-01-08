@@ -1,0 +1,8 @@
+{
+  "nomenclature": {
+    "name": "oauth",
+    "verboseName": "Oauth2-based authentication"
+  },
+  "baseUrl": "/oauth",
+  "source": "oauth/src/index"
+}

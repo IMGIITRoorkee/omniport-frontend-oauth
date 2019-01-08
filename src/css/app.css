@@ -1,0 +1,71 @@
+.app-container {
+    height: 100%;
+}
+
+.relation-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.site-logo {
+    height: 3.5em;
+}
+
+.logo-text {
+    display: inline-flex;
+    height: 3.5em;
+    vertical-align: bottom;
+    align-items: center;
+}
+
+.relation-image-wrapper {
+    margin: 0.5em;
+}
+
+.desc-container {
+    display: flex;
+    justify-content: center;
+    text-align: left;
+}
+
+.insert-it-to-left {
+    position: relative;
+    left: -2em;
+    animation-name: insertion-left;
+    transition-timing-function: ease-in;
+    animation-duration: 0.75s;
+    transform: translateX(2em);
+}
+
+.insert-it-to-right {
+    position: relative;
+    right: -2em;
+    animation-name: insertion-right;
+    transition-timing-function: ease-in;
+    animation-duration: 0.75s;
+    transform: translateX(-2em);
+}
+
+.data-points {
+    text-align: left;
+    margin-top: 1em;
+}
+
+.form {
+    display: inline;
+}
+
+@keyframes insertion-left {
+    from {transform: translateX(0)}
+    to {
+        transform: translateX(2em)
+    }
+}
+
+@keyframes insertion-right  {
+    from {transform: translateX(0)}
+    to {
+        transform: translateX(-2em)
+    }
+}
