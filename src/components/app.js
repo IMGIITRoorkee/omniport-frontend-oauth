@@ -5,7 +5,6 @@ import { Grid } from 'semantic-ui-react'
 
 import { AppHeader, AppFooter, AppMain } from 'formula_one'
 import AuthorisationBox from './authorisationbox'
-import { setLinkList } from '../actions'
 
 import main from 'formula_one/src/css/app.css'
 import blocks from '../css/app.css'
@@ -27,7 +26,7 @@ class App extends React.PureComponent {
     return (
       <React.Fragment>
         <div styleName='main.app'>
-          <AppHeader mode='site' appName='open_auth' />
+          <AppHeader />
           <AppMain>
             <div styleName='main.app-main'>
               <Scrollbars autoHide>
@@ -56,15 +55,5 @@ function mapStateToProps (state) {
     linkList: state.linkList
   }
 }
-const mapDispatchToProps = dispatch => {
-  return {
-    SetLinkList: () => {
-      dispatch(setLinkList())
-    }
-  }
-}
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App)
+export default connect(mapStateToProps)(App)
