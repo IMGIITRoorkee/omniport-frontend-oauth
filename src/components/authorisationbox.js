@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import { startCase } from 'lodash'
@@ -212,6 +213,8 @@ class AuthorisationBox extends React.Component {
                   negative
                   content='Deny'
                   icon='hand paper outline'
+                  as={Link}
+                  to='/'
                 />
                 <form
                   styleName='blocks.form'
