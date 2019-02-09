@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Scrollbars } from 'react-custom-scrollbars'
-import { Grid } from 'semantic-ui-react'
+import { Grid, Container } from 'semantic-ui-react'
 
 import { AppHeader, AppFooter, AppMain } from 'formula_one'
 import AuthorisationBox from './authorisationbox'
@@ -30,16 +30,9 @@ class App extends React.PureComponent {
           <AppMain>
             <div styleName='main.app-main'>
               <Scrollbars autoHide>
-                <Grid
-                  container
-                  centered
-                  stackable
-                  styleName='blocks.app-container'
-                >
-                  <Grid.Column width={8} verticalAlign='middle'>
-                    <AuthorisationBox history={this.props.history} />
-                  </Grid.Column>
-                </Grid>
+                <Container styleName='blocks.app-container'>
+                  <AuthorisationBox history={this.props.history} />
+                </Container>
               </Scrollbars>
             </div>
           </AppMain>

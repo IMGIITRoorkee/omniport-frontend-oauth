@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import { startCase } from 'lodash'
+import { isMobile } from 'react-device-detect'
 import {
   Icon,
   Image,
@@ -10,10 +11,19 @@ import {
   Header,
   Button,
   Label,
-  Accordion
+  Accordion,
+  Grid
 } from 'semantic-ui-react'
 
-import { getTheme, urlWhoAmI, UserCard, getCookie } from 'formula_one'
+import {
+  getTheme,
+  urlWhoAmI,
+  UserCard,
+  getCookie,
+  Loading,
+  ErrorRabbit,
+  ErrorDart
+} from 'formula_one'
 import { urlSiteBranding, urlAuthoriseUser } from '../urls'
 import { setApp } from '../actions'
 
@@ -141,124 +151,140 @@ class AuthorisationBox extends React.Component {
       <React.Fragment>
         {loaded && oauthApp.isLoaded ? (
           !error ? (
-            <React.Fragment>
-              <Segment textAlign='left' color={getTheme()} attached='top'>
-                <Header as='h3'>Authorise external app</Header>
-              </Segment>
-              <Segment attached textAlign='center'>
-                <div styleName='relation-image-container'>
-                  <div styleName='relation-image-wrapper blocks.insert-it-to-right'>
-                    {this.headerLogoRenderer()}
+            <Grid container centered stackable>
+              <Grid.Column width={8} verticalAlign='middle'>
+                <Segment textAlign='left' color={getTheme()} attached='top'>
+                  <Header as='h3'>Authorise external app</Header>
+                </Segment>
+                <Segment attached textAlign='center'>
+                  <div styleName='relation-image-container'>
+                    <div styleName='relation-image-wrapper blocks.insert-it-to-right'>
+                      {this.headerLogoRenderer()}
+                    </div>
+                    <div styleName='relation-image-wrapper'>
+                      <Icon name='add' />
+                    </div>
+                    <div styleName='relation-image-wrapper blocks.insert-it-to-left'>
+                      {data.logo ? (
+                        <Image
+                          src={data.logo}
+                          styleName='blocks.site-logo'
+                          alt='App logo'
+                        />
+                      ) : (
+                        <Icon
+                          name='cube'
+                          color={getTheme()}
+                          size='big'
+                          styleName='blocks.default-icon'
+                        />
+                      )}
+                    </div>
                   </div>
-                  <div styleName='relation-image-wrapper'>
-                    <Icon name='add' />
+                  <div styleName='desc-container'>
+                    <Segment compact basic>
+                      <UserCard
+                        name={user.fullName}
+                        image={user.displayPicture}
+                        roles={user.roles.map(role => {
+                          return role.role
+                        })}
+                      />
+                    </Segment>
                   </div>
-                  <div styleName='relation-image-wrapper blocks.insert-it-to-left'>
-                    <Image
-                      src={data.logo}
-                      styleName='blocks.site-logo'
-                      alt='App logo'
-                    />
-                  </div>
-                </div>
-                <div styleName='desc-container'>
-                  <Segment compact basic>
-                    <UserCard
-                      name={user.fullName}
-                      image={user.displayPicture}
-                      roles={user.roles.map(role => {
-                        return role.role
-                      })}
-                    />
-                  </Segment>
-                </div>
-                The <strong>{data.name}</strong> app wants to connect to your
-                <strong> {site.nomenclature.verboseName}</strong> account. It
-                will recieve the following information, if you authorise it.
-                <Accordion styled styleName='blocks.data-points'>
-                  {Object.keys(
-                    this.convertDictionary(Object.keys(data.dataPoints))
-                  ).map((category, i) => {
-                    return (
-                      <React.Fragment key={i}>
-                        <Accordion.Title
-                          active={activeIndex === i}
-                          index={i}
-                          onClick={this.handleClick}
-                        >
-                          <Icon name='dropdown' />
-                          {startCase(category)}
-                        </Accordion.Title>
-                        <Accordion.Content active={activeIndex === i}>
-                          <Label.Group color={getTheme()}>
-                            {this.convertDictionary(
-                              Object.keys(data.dataPoints)
-                            )[category].map(scope => {
-                              return (
-                                <Label key={data.dataPoints[scope]}>
-                                  {data.dataPoints[scope]}
-                                </Label>
-                              )
-                            })}
-                          </Label.Group>
-                        </Accordion.Content>
-                      </React.Fragment>
-                    )
-                  })}
-                </Accordion>
-              </Segment>
-              <Segment textAlign='right' attached='bottom'>
-                <Button
-                  basic
-                  negative
-                  content='Deny'
-                  icon='hand paper outline'
-                  as={Link}
-                  to='/'
-                />
-                <form
-                  styleName='blocks.form'
-                  method='POST'
-                  action={urlAuthoriseUser()}
-                >
-                  <input
-                    type='hidden'
-                    name='csrfmiddlewaretoken'
-                    value={getCookie('csrftoken')}
-                  />
-                  <input
-                    type='hidden'
-                    name='redirect_uri'
-                    value={this.state.redirectUri}
-                  />
-                  <input
-                    type='hidden'
-                    name='client_id'
-                    value={this.state.clientId}
-                  />
-                  <input type='hidden' name='state' value={this.state.state} />
-                  <input
-                    type='hidden'
-                    name='response_type'
-                    value={this.state.responseType}
-                  />
-                  <input type='hidden' name='allow' value='Authorize' />
-                  <input type='hidden' name='scope' value='read write' />
+                  The <strong>{data.name}</strong> app wants to connect to your
+                  <strong> {site.nomenclature.verboseName}</strong> account. It
+                  will recieve the following information, if you authorise it.
+                  <Accordion styled styleName='blocks.data-points'>
+                    {Object.keys(
+                      this.convertDictionary(Object.keys(data.dataPoints))
+                    ).map((category, i) => {
+                      return (
+                        <React.Fragment key={i}>
+                          <Accordion.Title
+                            active={activeIndex === i}
+                            index={i}
+                            onClick={this.handleClick}
+                          >
+                            <Icon name='dropdown' />
+                            {startCase(category)}
+                          </Accordion.Title>
+                          <Accordion.Content active={activeIndex === i}>
+                            <Label.Group color={getTheme()}>
+                              {this.convertDictionary(
+                                Object.keys(data.dataPoints)
+                              )[category].map(scope => {
+                                return (
+                                  <Label key={data.dataPoints[scope]}>
+                                    {data.dataPoints[scope]}
+                                  </Label>
+                                )
+                              })}
+                            </Label.Group>
+                          </Accordion.Content>
+                        </React.Fragment>
+                      )
+                    })}
+                  </Accordion>
+                </Segment>
+                <Segment textAlign='right' attached='bottom'>
                   <Button
-                    type='submit'
                     basic
-                    primary
-                    content='Allow'
-                    icon='handshake outline'
+                    negative
+                    content='Deny'
+                    icon='hand paper outline'
+                    as={Link}
+                    to='/'
                   />
-                </form>
-              </Segment>
-            </React.Fragment>
+                  <form
+                    styleName='blocks.form'
+                    method='POST'
+                    action={urlAuthoriseUser()}
+                  >
+                    <input
+                      type='hidden'
+                      name='csrfmiddlewaretoken'
+                      value={getCookie('csrftoken')}
+                    />
+                    <input
+                      type='hidden'
+                      name='redirect_uri'
+                      value={this.state.redirectUri}
+                    />
+                    <input
+                      type='hidden'
+                      name='client_id'
+                      value={this.state.clientId}
+                    />
+                    <input
+                      type='hidden'
+                      name='state'
+                      value={this.state.state}
+                    />
+                    <input
+                      type='hidden'
+                      name='response_type'
+                      value={this.state.responseType}
+                    />
+                    <input type='hidden' name='allow' value='Authorize' />
+                    <input type='hidden' name='scope' value='read write' />
+                    <Button
+                      type='submit'
+                      primary
+                      content='Allow'
+                      icon='handshake outline'
+                    />
+                  </form>
+                </Segment>
+              </Grid.Column>
+            </Grid>
+          ) : isMobile ? (
+            <ErrorRabbit />
           ) : (
-            'Error'
+            <ErrorDart />
           )
         ) : (
-          'Loading'
+          <Loading />
         )}
       </React.Fragment>
     )

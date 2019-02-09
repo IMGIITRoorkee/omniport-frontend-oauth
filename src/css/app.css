@@ -1,5 +1,12 @@
 .app-container {
     height: 100%;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.default-icon{
+    font-size: 2.5em !important;
 }
 
 .relation-image-container {
