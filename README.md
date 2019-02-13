@@ -1,3 +1,3 @@
-# Oauth2-based authentication
+# OAuth2-based authentication
 
 > Omniport service frontend
