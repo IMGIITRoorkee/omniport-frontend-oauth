@@ -30,7 +30,7 @@ import { setApp } from '../actions'
 import blocks from '../css/app.css'
 
 class AuthorisationBox extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       site: null,
@@ -39,7 +39,7 @@ class AuthorisationBox extends React.Component {
       activeIndex: -1
     }
   }
-  componentDidMount () {
+  componentDidMount() {
     this.setState(
       {
         clientId: this.getURLParam('client_id'),
@@ -65,10 +65,10 @@ class AuthorisationBox extends React.Component {
     const url = new URL(url_string)
     return url.searchParams.get(param)
   }
-  getSiteBranding () {
+  getSiteBranding() {
     return axios.get(urlSiteBranding())
   }
-  getUser () {
+  getUser() {
     return axios.get(urlWhoAmI())
   }
   addBranding = () => {
@@ -143,7 +143,7 @@ class AuthorisationBox extends React.Component {
     }
     return dict
   }
-  render () {
+  render() {
     const { user, loaded, site, activeIndex } = this.state
     const { oauthApp } = this.props
     const { data, error } = oauthApp
@@ -172,13 +172,13 @@ class AuthorisationBox extends React.Component {
                           alt='App logo'
                         />
                       ) : (
-                        <Icon
-                          name='cube'
-                          color={getTheme()}
-                          size='big'
-                          styleName='blocks.default-icon'
-                        />
-                      )}
+                          <Icon
+                            name='cube'
+                            color={getTheme()}
+                            size='big'
+                            styleName='blocks.default-icon'
+                          />
+                        )}
                     </div>
                   </div>
                   <div styleName='desc-container'>
@@ -192,42 +192,44 @@ class AuthorisationBox extends React.Component {
                       />
                     </Segment>
                   </div>
-                  The <strong>{data.name}</strong> app wants to connect to your
+                  {!data.skipAuthorization ? <React.Fragment>
+                    The <strong>{data.name}</strong> app wants to connect to your
                   <strong> {site.nomenclature.verboseName}</strong> account. It
-                  will recieve the following information, if you authorise it.
+                                                                  will recieve the following information, if you authorise it.
                   <Accordion styled styleName='blocks.data-points'>
-                    {Object.keys(
-                      this.convertDictionary(Object.keys(data.dataPoints))
-                    ).map((category, i) => {
-                      return (
-                        <React.Fragment key={i}>
-                          <Accordion.Title
-                            active={activeIndex === i}
-                            index={i}
-                            onClick={this.handleClick}
-                          >
-                            <Icon name='dropdown' />
-                            {startCase(category)}
-                          </Accordion.Title>
-                          <Accordion.Content active={activeIndex === i}>
-                            <Label.Group color={getTheme()}>
-                              {this.convertDictionary(
-                                Object.keys(data.dataPoints)
-                              )[category].map(scope => {
-                                return (
-                                  <Label key={data.dataPoints[scope]}>
-                                    {data.dataPoints[scope]}
-                                  </Label>
-                                )
-                              })}
-                            </Label.Group>
-                          </Accordion.Content>
-                        </React.Fragment>
-                      )
-                    })}
-                  </Accordion>
+                      {Object.keys(
+                        this.convertDictionary(Object.keys(data.dataPoints))
+                      ).map((category, i) => {
+                        return (
+                          <React.Fragment key={i}>
+                            <Accordion.Title
+                              active={activeIndex === i}
+                              index={i}
+                              onClick={this.handleClick}
+                            >
+                              <Icon name='dropdown' />
+                              {startCase(category)}
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === i}>
+                              <Label.Group color={getTheme()}>
+                                {this.convertDictionary(
+                                  Object.keys(data.dataPoints)
+                                )[category].map(scope => {
+                                  return (
+                                    <Label key={data.dataPoints[scope]}>
+                                      {data.dataPoints[scope]}
+                                    </Label>
+                                  )
+                                })}
+                              </Label.Group>
+                            </Accordion.Content>
+                          </React.Fragment>
+                        )
+                      })}
+                    </Accordion>
+                  </React.Fragment> : <strong>{data.name}</strong>}
                 </Segment>
-                <Segment textAlign='right' attached='bottom'>
+                {!data.skipAuthorization ? <Segment textAlign='right' attached='bottom'>
                   <Button
                     basic
                     negative
@@ -275,23 +277,63 @@ class AuthorisationBox extends React.Component {
                       icon='handshake outline'
                     />
                   </form>
-                </Segment>
+                </Segment> :
+                  <form
+                    styleName='blocks.form'
+                    method='POST'
+                    action={urlAuthoriseUser()}
+                  >
+                    <input
+                      type='hidden'
+                      name='csrfmiddlewaretoken'
+                      value={getCookie('csrftoken')}
+                    />
+                    <input
+                      type='hidden'
+                      name='redirect_uri'
+                      value={this.state.redirectUri}
+                    />
+                    <input
+                      type='hidden'
+                      name='client_id'
+                      value={this.state.clientId}
+                    />
+                    <input
+                      type='hidden'
+                      name='state'
+                      value={this.state.state}
+                    />
+                    <input
+                      type='hidden'
+                      name='response_type'
+                      value={this.state.responseType}
+                    />
+                    <input type='hidden' name='allow' value='Authorize' />
+                    <input type='hidden' name='scope' value='read write' />
+                    <input
+                      type='submit'
+                      styleName="blocks.hidden"
+                      ref={input => {
+                        input.click()
+                      }}
+                    />
+                  </form>}
               </Grid.Column>
             </Grid>
           ) : isMobile ? (
             <ErrorRabbit />
           ) : (
-            <ErrorDart />
-          )
+                <ErrorDart />
+              )
         ) : (
-          <Loading />
-        )}
+            <Loading />
+          )}
       </React.Fragment>
     )
   }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   return {
     oauthApp: state.oauthApp
   }
