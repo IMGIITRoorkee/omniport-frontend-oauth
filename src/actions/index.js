@@ -17,7 +17,7 @@ export const setApp = (clientId, callback) => {
           }
         })
       })
-      .catch(err => {
+      .catch(() => {
         dispatch({
           type: 'SET_APP',
           payload: {
